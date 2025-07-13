@@ -200,6 +200,35 @@
             font-weight: 600;
         }
 
+        .savings.highlighted {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            font-size: 0.9rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+            animation: pulse-savings 2s infinite;
+        }
+
+        @keyframes pulse-savings {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .savings-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 2;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+        }
+
         .product-link {
             display: inline-block;
             background: linear-gradient(45deg, #667eea, #764ba2);
@@ -221,6 +250,26 @@
             color: white;
             font-size: 1.2rem;
             margin-top: 50px;
+        }
+
+        .best-badge {
+            position: absolute;
+            top: 60px;
+            right: 15px;
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 12px;
+            z-index: 2;
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4); }
+            to { box-shadow: 0 4px 20px rgba(155, 89, 182, 0.8); }
         }
 
         @media (max-width: 768px) {
@@ -253,12 +302,28 @@
                     <label for="sort">Sort By</label>
                     <select id="sort" name="sort">
                         <option value="default" {{ 'selected' if sort_by == 'default' else '' }}>🎯 Best Deals (Discount + Price)</option>
-                        <option value="price_asc" {{ 'selected' if sort_by == 'price_asc' else '' }}>💰 Price: Low to High</option>
-                        <option value="price_desc" {{ 'selected' if sort_by == 'price_desc' else '' }}>💸 Price: High to Low</option>
-                        <option value="discount_desc" {{ 'selected' if sort_by == 'discount_desc' else '' }}>🔥 Discount: High to Low</option>
-                        <option value="discount_asc" {{ 'selected' if sort_by == 'discount_asc' else '' }}>📈 Discount: Low to High</option>
-                        <option value="name_asc" {{ 'selected' if sort_by == 'name_asc' else '' }}>🔤 Name: A to Z</option>
-                        <option value="name_desc" {{ 'selected' if sort_by == 'name_desc' else '' }}>🔡 Name: Z to A</option>
+                        <optgroup label="🏆 Best Items">
+                            <option value="value_score" {{ 'selected' if sort_by == 'value_score' else '' }}>💎 Best Value Score</option>
+                            <option value="steals" {{ 'selected' if sort_by == 'steals' else '' }}>🔥 Ultra Steals (80%+ off, under €8)</option>
+                            <option value="premium_steals" {{ 'selected' if sort_by == 'premium_steals' else '' }}>⭐ Premium Steals (€30+ → under €10)</option>
+                            <option value="savings_ratio" {{ 'selected' if sort_by == 'savings_ratio' else '' }}>📊 Best Bang for Buck</option>
+                        </optgroup>
+                        <optgroup label="💲 By Savings">
+                            <option value="savings_desc" {{ 'selected' if sort_by == 'savings_desc' else '' }}>💎 Biggest Savings (€ High to Low)</option>
+                            <option value="savings_asc" {{ 'selected' if sort_by == 'savings_asc' else '' }}>💰 Smallest Savings (€ Low to High)</option>
+                        </optgroup>
+                        <optgroup label="💰 By Price">
+                            <option value="price_asc" {{ 'selected' if sort_by == 'price_asc' else '' }}>💰 Price: Low to High</option>
+                            <option value="price_desc" {{ 'selected' if sort_by == 'price_desc' else '' }}>🏷️ Price: High to Low</option>
+                        </optgroup>
+                        <optgroup label="🔥 By Discount">
+                            <option value="discount_desc" {{ 'selected' if sort_by == 'discount_desc' else '' }}>🔥 Discount: High to Low</option>
+                            <option value="discount_asc" {{ 'selected' if sort_by == 'discount_asc' else '' }}>📈 Discount: Low to High</option>
+                        </optgroup>
+                        <optgroup label="🔤 By Name">
+                            <option value="name_asc" {{ 'selected' if sort_by == 'name_asc' else '' }}>🔤 Name: A to Z</option>
+                            <option value="name_desc" {{ 'selected' if sort_by == 'name_desc' else '' }}>🔡 Name: Z to A</option>
+                        </optgroup>
                     </select>
                 </div>
                 
@@ -280,6 +345,12 @@
                            value="{{ max_price if max_price and max_price < 999999 else '' }}" min="0">
                 </div>
                 
+                <div class="filter-group">
+                    <label for="min_savings">Min Savings (€)</label>
+                    <input type="number" id="min_savings" name="min_savings" step="0.01"
+                           value="{{ min_savings or 0 }}" min="0" placeholder="0.00">
+                </div>
+                
                 <button type="submit" class="filter-btn">🔍 Apply Filters & Sort</button>
                 <a href="/" class="filter-btn" style="text-decoration: none; display: inline-block;">🔄 Reset</a>
             </form>
@@ -288,8 +359,14 @@
         {% if products %}
         <div class="stats">
             📊 Showing {{ products|length }} products - Sorted by: 
-            {% if sort_by == 'price_asc' %}💰 Price: Low to High
-            {% elif sort_by == 'price_desc' %}💸 Price: High to Low
+            {% if sort_by == 'value_score' %}💎 Best Value Score (Combines discount, savings & price)
+            {% elif sort_by == 'steals' %}🔥 Ultra Steals (80%+ off, under €8)
+            {% elif sort_by == 'premium_steals' %}⭐ Premium Steals (€30+ original → under €10)
+            {% elif sort_by == 'savings_ratio' %}📊 Best Bang for Buck (Savings per € spent)
+            {% elif sort_by == 'savings_desc' %}💎 Biggest Savings (€ High to Low)
+            {% elif sort_by == 'savings_asc' %}💰 Smallest Savings (€ Low to High)
+            {% elif sort_by == 'price_asc' %}💰 Price: Low to High
+            {% elif sort_by == 'price_desc' %}🏷️ Price: High to Low
             {% elif sort_by == 'discount_desc' %}🔥 Discount: High to Low
             {% elif sort_by == 'discount_asc' %}📈 Discount: Low to High
             {% elif sort_by == 'name_asc' %}🔤 Name: A to Z
@@ -303,6 +380,21 @@
             <div class="product-card">
                 {% if product.discount_amount and product.discount_amount != 'N/A' %}
                 <div class="discount-badge">{{ product.discount_amount }}</div>
+                {% endif %}
+                
+                {% if (sort_by == 'savings_desc' or sort_by == 'savings_asc') and product.savings_amount > 0 %}
+                <div class="savings-badge">💎 Save €{{ "%.2f"|format(product.savings_amount) }}</div>
+                {% endif %}
+                
+                <!-- Best Items Badges -->
+                {% if sort_by == 'value_score' and loop.index <= 10 %}
+                <div class="best-badge">💎 TOP VALUE</div>
+                {% elif sort_by == 'steals' %}
+                <div class="best-badge">🔥 STEAL</div>
+                {% elif sort_by == 'premium_steals' %}
+                <div class="best-badge">⭐ PREMIUM STEAL</div>
+                {% elif sort_by == 'savings_ratio' and loop.index <= 20 %}
+                <div class="best-badge">📊 BEST BANG</div>
                 {% endif %}
                 
                 {% if product.image_url %}
@@ -322,7 +414,9 @@
                         {% endif %}
                         
                         {% if product.savings_amount > 0 %}
-                        <span class="savings">Save €{{ "%.2f"|format(product.savings_amount) }}</span>
+                        <span class="savings {{ 'highlighted' if (sort_by == 'savings_desc' or sort_by == 'savings_asc') else '' }}">
+                            Save €{{ "%.2f"|format(product.savings_amount) }}
+                        </span>
                         {% endif %}
                     </div>
                     
