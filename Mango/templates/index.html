@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mango Outlet - Best Deals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .filters {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .filter-group input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            background: white;
+            min-width: 150px;
+        }
+
+        .filter-group select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .discount-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 2;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .price-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .original-price {
+            font-size: 1rem;
+            color: #95a5a6;
+            text-decoration: line-through;
+        }
+
+        .savings {
+            background: #2ecc71;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .savings.highlighted {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            font-size: 0.9rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+            animation: pulse-savings 2s infinite;
+        }
+
+        @keyframes pulse-savings {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .savings-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 2;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+        }
+
+        .product-link {
+            display: inline-block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .product-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .no-products {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 50px;
+        }
+
+        .best-badge {
+            position: absolute;
+            top: 60px;
+            right: 15px;
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 12px;
+            z-index: 2;
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4); }
+            to { box-shadow: 0 4px 20px rgba(155, 89, 182, 0.8); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ Mango Outlet - Best Deals</h1>
+            <p>Sorted by highest discount, then lowest price - Best value first!</p>
+        </div>
+
+        <div class="filters">
+            <form action="/filter" method="get" class="filter-row">
+                <div class="filter-group">
+                    <label for="sort">Sort By</label>
+                    <select id="sort" name="sort">
+                        <option value="default" {{ 'selected' if sort_by == 'default' else '' }}>🎯 Best Deals (Discount + Price)</option>
+                        <optgroup label="🏆 Best Items">
+                            <option value="value_score" {{ 'selected' if sort_by == 'value_score' else '' }}>💎 Best Value Score</option>
+                            <option value="steals" {{ 'selected' if sort_by == 'steals' else '' }}>🔥 Ultra Steals (80%+ off, under €8)</option>
+                            <option value="premium_steals" {{ 'selected' if sort_by == 'premium_steals' else '' }}>⭐ Premium Steals (€30+ → under €10)</option>
+                            <option value="savings_ratio" {{ 'selected' if sort_by == 'savings_ratio' else '' }}>📊 Best Bang for Buck</option>
+                        </optgroup>
+                        <optgroup label="💲 By Savings">
+                            <option value="savings_desc" {{ 'selected' if sort_by == 'savings_desc' else '' }}>💎 Biggest Savings (€ High to Low)</option>
+                            <option value="savings_asc" {{ 'selected' if sort_by == 'savings_asc' else '' }}>💰 Smallest Savings (€ Low to High)</option>
+                        </optgroup>
+                        <optgroup label="💰 By Price">
+                            <option value="price_asc" {{ 'selected' if sort_by == 'price_asc' else '' }}>💰 Price: Low to High</option>
+                            <option value="price_desc" {{ 'selected' if sort_by == 'price_desc' else '' }}>🏷️ Price: High to Low</option>
+                        </optgroup>
+                        <optgroup label="🔥 By Discount">
+                            <option value="discount_desc" {{ 'selected' if sort_by == 'discount_desc' else '' }}>🔥 Discount: High to Low</option>
+                            <option value="discount_asc" {{ 'selected' if sort_by == 'discount_asc' else '' }}>📈 Discount: Low to High</option>
+                        </optgroup>
+                        <optgroup label="🔤 By Name">
+                            <option value="name_asc" {{ 'selected' if sort_by == 'name_asc' else '' }}>🔤 Name: A to Z</option>
+                            <option value="name_desc" {{ 'selected' if sort_by == 'name_desc' else '' }}>🔡 Name: Z to A</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="min_discount">Min Discount (%)</label>
+                    <input type="number" id="min_discount" name="min_discount" 
+                           value="{{ min_discount or 0 }}" min="0" max="100">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="min_price">Min Price (€)</label>
+                    <input type="number" id="min_price" name="min_price" step="0.01"
+                           value="{{ min_price or 0 }}" min="0">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="max_price">Max Price (€)</label>
+                    <input type="number" id="max_price" name="max_price" step="0.01"
+                           value="{{ max_price if max_price and max_price < 999999 else '' }}" min="0">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="min_savings">Min Savings (€)</label>
+                    <input type="number" id="min_savings" name="min_savings" step="0.01"
+                           value="{{ min_savings or 0 }}" min="0" placeholder="0.00">
+                </div>
+                
+                <button type="submit" class="filter-btn">🔍 Apply Filters & Sort</button>
+                <a href="/" class="filter-btn" style="text-decoration: none; display: inline-block;">🔄 Reset</a>
+            </form>
+        </div>
+
+        {% if products %}
+        <div class="stats">
+            📊 Showing {{ products|length }} products - Sorted by: 
+            {% if sort_by == 'value_score' %}💎 Best Value Score (Combines discount, savings & price)
+            {% elif sort_by == 'steals' %}🔥 Ultra Steals (80%+ off, under €8)
+            {% elif sort_by == 'premium_steals' %}⭐ Premium Steals (€30+ original → under €10)
+            {% elif sort_by == 'savings_ratio' %}📊 Best Bang for Buck (Savings per € spent)
+            {% elif sort_by == 'savings_desc' %}💎 Biggest Savings (€ High to Low)
+            {% elif sort_by == 'savings_asc' %}💰 Smallest Savings (€ Low to High)
+            {% elif sort_by == 'price_asc' %}💰 Price: Low to High
+            {% elif sort_by == 'price_desc' %}🏷️ Price: High to Low
+            {% elif sort_by == 'discount_desc' %}🔥 Discount: High to Low
+            {% elif sort_by == 'discount_asc' %}📈 Discount: Low to High
+            {% elif sort_by == 'name_asc' %}🔤 Name: A to Z
+            {% elif sort_by == 'name_desc' %}🔡 Name: Z to A
+            {% else %}🎯 Best Deals (Highest discount → Lowest price)
+            {% endif %}
+        </div>
+
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                {% if product.discount_amount and product.discount_amount != 'N/A' %}
+                <div class="discount-badge">{{ product.discount_amount }}</div>
+                {% endif %}
+                
+                {% if (sort_by == 'savings_desc' or sort_by == 'savings_asc') and product.savings_amount > 0 %}
+                <div class="savings-badge">💎 Save €{{ "%.2f"|format(product.savings_amount) }}</div>
+                {% endif %}
+                
+                <!-- Best Items Badges -->
+                {% if sort_by == 'value_score' and loop.index <= 10 %}
+                <div class="best-badge">💎 TOP VALUE</div>
+                {% elif sort_by == 'steals' %}
+                <div class="best-badge">🔥 STEAL</div>
+                {% elif sort_by == 'premium_steals' %}
+                <div class="best-badge">⭐ PREMIUM STEAL</div>
+                {% elif sort_by == 'savings_ratio' and loop.index <= 20 %}
+                <div class="best-badge">📊 BEST BANG</div>
+                {% endif %}
+                
+                {% if product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+                {% endif %}
+                
+                <div class="product-info">
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    
+                    <div class="price-section">
+                        {% if product.current_price %}
+                        <span class="current-price">{{ product.current_price }}</span>
+                        {% endif %}
+                        
+                        {% if product.original_price and product.original_price != product.current_price %}
+                        <span class="original-price">{{ product.original_price }}</span>
+                        {% endif %}
+                        
+                        {% if product.savings_amount > 0 %}
+                        <span class="savings {{ 'highlighted' if (sort_by == 'savings_desc' or sort_by == 'savings_asc') else '' }}">
+                            Save €{{ "%.2f"|format(product.savings_amount) }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if product.product_url %}
+                    <a href="https://www.mangooutlet.com{{ product.product_url }}" 
+                       target="_blank" class="product-link">
+                        🛒 View Product
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-products">
+            <p>No products found matching your criteria. Try adjusting the filters!</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Auto-submit form when sort option changes
+        document.getElementById('sort').addEventListener('change', function() {
+            this.form.submit();
+        });
+
+        // Add loading state when form is submitted
+        document.querySelector('form').addEventListener('submit', function() {
+            const submitBtn = document.querySelector('.filter-btn[type="submit"]');
+            submitBtn.innerHTML = '⏳ Applying...';
+            submitBtn.disabled = true;
+        });
+
+        // Smooth scroll to top when page loads with filters
+        if (window.location.search) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
